@@ -1,0 +1,41 @@
+#!/bin/bash 
+# 
+# VIM Tag file Generator
+#
+# Alvaro Navarro <alnacle@gmail.com>
+
+vimdir=${HOME}/.vim
+tagcfg=${vimdir}/tagrc
+tagdir=${vimdir}/tags
+
+cflags=`which ctags`
+
+if [ -z ${cflags} ]; then
+    echo "Error: Exuberant ctags must be installed before continue"
+    exit 1
+fi 
+
+if [ -f ${tagcfg} ]; then
+    rm -f ${tagcfg}
+fi 
+
+if [ ! -d ${tagdir} ]; then
+    mkdir ${tagdir}
+fi
+
+for i in $@;
+do
+    if [ ! -d $i ]; then
+        echo "No sources found in $i. Skipping..."
+    else
+        echo "Generating tags for $i..."
+        tagfile=${tagdir}/`basename $i`
+        echo ${tagfile}
+        touch ${tagfile}
+        ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q+f --language-force=C++ -f ${tagfile} $i
+        echo "Adding references to tagrc file..."
+        echo "set path+=$i/**" >> ${tagcfg}
+        echo "set tags+=${vimdir}/tags/`basename $i`" >> ${tagcfg}
+    fi
+done
+
