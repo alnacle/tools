@@ -1,8 +1,8 @@
-#!/bin/bash 
+#!/bin/sh 
 # 
 # VIM Tag file Generator
 #
-# Alvaro Navarro <alnacle@gmail.com>
+# Alvaro Navarro <anavarro@achtung.es>
 
 vimdir=${HOME}/.vim
 tagcfg=${vimdir}/tagrc
