@@ -1,5 +1,5 @@
-#!/bin/sh 
-# 
+#!/bin/sh
+#
 # VIM Tag file Generator
 #
 # Alvaro Navarro <anavarro@achtung.es>
@@ -9,29 +9,36 @@ tagdir=${vimdir}/tags
 
 cflags=`which ctags`
 
+usage() {
+	echo "Usage: $0 <tag_id> <header_directory>"
+	exit 1
+}
+
 if [ -z ${cflags} ]; then
     echo "Error: Exuberant ctags must be installed before continue"
     exit 1
 fi
 
-if [ ! -d ${tagdir} ]; then
-    mkdir ${tagdir}
+if [ $# -ne 2 ]; then
+	usage
 fi
 
-for i in $@;
-do
-    if [ ! -d $i ]; then
-        echo "No sources found in $i. Skipping..."
-    else
-        tagfile=${tagdir}/`basename $i`
-        vimfile=${tagdir}/`basename $i.vim`
+if [ ! -d ${tagdir} ]; then
+    mkdir -p ${tagdir}
+fi
 
-        echo "Creating $tagfile"
-        ctags -R --sort=1 --c++-kinds=+p --fields=+iaS --extra=+q+f --language-force=C++ -f ${tagfile} $i
+if [ ! -d $2 ]; then
+	echo "Error: No sources found in $2."
+	usage
+fi
 
-        echo "Adding $i to $vimfile..."
-        echo "set path+=$i/**"      >  ${vimfile}
-        echo "set tags+=${tagfile}" >> ${vimfile}
-    fi
-done
+tagfile=${tagdir}/`basename $1`
+vimfile=${tagdir}/`basename $1.vim`
+
+echo "Creating $tagfile"
+ctags -R --sort=1 --c++-kinds=+pl --fields=+iaS --extra=+q+f --language-force=C++ -f ${tagfile} $2
+
+echo "Adding $1 to $vimfile..."
+echo "set path+=$2/**"      >  ${vimfile}
+echo "set tags+=${tagfile}" >> ${vimfile}
 
